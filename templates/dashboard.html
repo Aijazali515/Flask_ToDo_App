@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - Flask Todo App{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h1 class="h4 mb-0">Your tasks</h1>
+  <a href="{{ url_for('task_new') }}" class="btn btn-success"><i class="bi bi-plus-circle me-1"></i> Add Task</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card stat-card border-primary-subtle">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stat-dot bg-primary me-3"></div>
+          <div>
+            <div class="small text-muted">Total</div>
+            <div class="h5 mb-0">{{ stats.total }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card border-success-subtle">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stat-dot bg-success me-3"></div>
+          <div>
+            <div class="small text-muted">Active (Pending)</div>
+            <div class="h5 mb-0">{{ stats.active }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card stat-card border-secondary-subtle">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="stat-dot bg-secondary me-3"></div>
+          <div>
+            <div class="small text-muted">Inactive (Done)</div>
+            <div class="h5 mb-0">{{ stats.inactive }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form method="GET" class="row g-2 align-items-end mb-3">
+  <div class="col-md-5">
+    <label class="form-label">Search</label>
+    <input type="text" class="form-control" name="q" placeholder="title or description" value="{{ q }}">
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Status</label>
+    <select class="form-select" name="status">
+      <option value="all" {{ 'selected' if status=='all' else '' }}>All</option>
+      <option value="active" {{ 'selected' if status=='active' else '' }}>Active</option>
+      <option value="inactive" {{ 'selected' if status=='inactive' else '' }}>Inactive</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <label class="form-label">Sort by</label>
+    <select class="form-select" name="sort">
+      <option value="created_desc" {{ 'selected' if sort=='created_desc' else '' }}>Created (newest)</option>
+      <option value="updated_desc" {{ 'selected' if sort=='updated_desc' else '' }}>Updated (newest)</option>
+      <option value="due_asc" {{ 'selected' if sort=='due_asc' else '' }}>Due date (soonest)</option>
+      <option value="due_desc" {{ 'selected' if sort=='due_desc' else '' }}>Due date (latest)</option>
+      <option value="title_asc" {{ 'selected' if sort=='title_asc' else '' }}>Title (A→Z)</option>
+      <option value="title_desc" {{ 'selected' if sort=='title_desc' else '' }}>Title (Z→A)</option>
+    </select>
+  </div>
+  <div class="col-md-1 d-grid">
+    <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+  </div>
+</form>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Due</th>
+          <th>Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for task in tasks %}
+        <tr class="{{ '' if task.is_active else 'table-secondary' }}">
+          <td class="fw-medium">{{ task.title }}</td>
+          <td class="text-muted small">{{ task.description or '-' }}</td>
+          <td>{{ task.due_date.strftime('%Y-%m-%d') if task.due_date else '-' }}</td>
+          <td>
+            <span class="badge {{ 'bg-success' if task.is_active else 'bg-secondary' }}" id="status-badge-{{ task.id }}">
+              {{ 'Active' if task.is_active else 'Inactive' }}
+            </span>
+          </td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm" role="group">
+              <a href="{{ url_for('task_edit', task_id=task.id) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square"></i></a>
+              <button class="btn {{ 'btn-outline-secondary' if task.is_active else 'btn-outline-success' }} toggle-btn" data-id="{{ task.id }}">
+                <i class="bi {{ 'bi-toggle-on' if task.is_active else 'bi-toggle-off' }} me-1"></i>
+                <span class="toggle-text">{{ 'Active' if task.is_active else 'Inactive' }}</span>
+              </button>
+              <form class="d-inline" method="POST" action="{{ url_for('task_delete', task_id=task.id) }}" onsubmit="return confirm('Delete this task?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="5" class="text-center text-muted py-4">No tasks found. Try adding one.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
