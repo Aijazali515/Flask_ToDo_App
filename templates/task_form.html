@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'New Task' if mode=='new' else 'Edit Task' }} - Flask Todo App{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-3">{{ 'Add a new task' if mode=='new' else 'Edit task' }}</h1>
+        <form method="POST" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.title.label(class_='form-label') }}
+            {{ form.title(class_='form-control', placeholder='e.g. Finish project report') }}
+            {% for e in form.title.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="mb-3">
+            {{ form.description.label(class_='form-label') }}
+            {{ form.description(class_='form-control', rows=4, placeholder='Optional details...') }}
+            {% for e in form.description.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              {{ form.due_date.label(class_='form-label') }}
+              {{ form.due_date(class_='form-control', type='date') }}
+              {% for e in form.due_date.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <div class="form-check">
+                {{ form.is_active(class_='form-check-input', checked=True if mode=='new' else form.is_active.data) }}
+                {{ form.is_active.label(class_='form-check-label') }}
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            {{ form.submit(class_='btn btn-primary') }}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
