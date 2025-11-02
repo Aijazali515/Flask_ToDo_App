@@ -1,0 +1,7 @@
+body { background: #f7f9fc; }
+.navbar-brand { font-weight: 600; }
+.flash-container { margin-bottom: 1rem; }
+.stat-card { border-left: 4px solid var(--bs-primary); }
+.stat-dot { width: 12px; height: 12px; border-radius: 50%; }
+.table td, .table th { vertical-align: middle; }
+.toggle-btn { min-width: 110px; }
